@@ -1,6 +1,9 @@
 #include <stdexcept>
 #include <iostream>
 #include <fstream>
+#include <cstring>
+
+#include "shift.hpp"
 
 namespace
 {
@@ -24,6 +27,7 @@ int main(const int argc, const char * const * argv)
   try
   {
     std::ifstream shift_record(createFileStream(argc, argv));
+    Shift shift = initShiftByFileData(shift_record);
   }
   catch (const std::logic_error & e)
   {
