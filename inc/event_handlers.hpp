@@ -2,6 +2,7 @@
 #define EVENT_HANDLERS_HPP
 
 #include <functional>
+#include <string>
 #include <map>
 
 #include "shift.hpp"
@@ -19,6 +20,7 @@ enum Event
 
 using EventHandlers = std::map< Event, std::function< void() > >;
 
-void initEventHandlers(EventHandlers & event_handlers, Shift & shift);
+void initEventHandlers(EventHandlers & event_handlers, std::string & event_info, Shift & shift);
+void simulateShiftAndOutputInfo(std::ostream & out, std::ifstream & shift_record, Shift & shift, const EventHandlers & event_handlers, std::string & event_info);
 
 #endif

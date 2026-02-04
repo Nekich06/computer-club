@@ -1,33 +1,24 @@
 #include "shift.hpp"
 
+#include <limits>
+
 namespace
 {
-  Time parseTimeStringToObject(const std::string & time)
-  {
-    std::string str_hours = time.substr(0, 2);
-    int hours = 0;
-    if (str_hours[0] == '0')
-    {
-      hours = str_hours[1] - '0';
-    }
-    else
-    {
-      hours = std::stoi(str_hours);
-    }
+  enum Errors {
+    YOU_SHALL_NOT_PASS,
+    NOT_OPEN_YET,
+    PLACE_IS_BUSY,
+    CLIENT_UNKNOWN,
+    I_CAN_WAIT_NO_LONGER
+  };
 
-    std::string str_minutes = time.substr(3, 2);
-    int minutes = 0;
-    if (str_minutes[0] == '0')
-    {
-      minutes = str_minutes[1] - '0';
-    }
-    else
-    {
-      minutes = std::stoi(str_hours);
-    }
-
-    return Time(hours, minutes);
-  }
+  std::string err_msgs[] = {
+    "YouShallNotPass",
+    "NotOpenYet",
+    "PlaceIsBusy",
+    "ClientUknown",
+    "ICanWaitNoLonger!"
+  };
 
   std::pair< Time, Time > initShiftTime(std::ifstream & shift_record)
   {
@@ -57,9 +48,24 @@ Shift::~Shift()
   delete[] tables;
 }
 
-std::ostream & Shift::Table::outputBusyTime(std::ostream & out)
+void Shift::recordClient(const Time & time, const Client & client)
 {
-  out << this->busy_time;
+  if (time < start)
+  {
+    if (!clients.insert({ client.name, client }).second)
+    {
+      throw std::invalid_argument(err_msgs[YOU_SHALL_NOT_PASS]);
+    }
+  }
+  else
+  {
+    throw std::invalid_argument(err_msgs[NOT_OPEN_YET]);
+  }
+}
+
+std::ostream & Shift::Table::outputBusyTime(std::ostream & out) const
+{
+  return out << busy_time;
 }
 
 Shift initShiftByFileData(std::ifstream & shift_record)
@@ -68,7 +74,7 @@ Shift initShiftByFileData(std::ifstream & shift_record)
   shift_record >> tables;
   if (tables <= 0)
   {
-    throw std::invalid_argument("Invalid value of tables number");
+    throw std::invalid_argument(std::to_string(tables));
   }
 
   std::pair< Time, Time > work_time = initShiftTime(shift_record);
@@ -77,8 +83,11 @@ Shift initShiftByFileData(std::ifstream & shift_record)
   shift_record >> price;
   if (price <= 0)
   {
-    throw std::invalid_argument("Invalid value of price per hour");
+    throw std::invalid_argument(std::to_string(price));
   }
+
+  shift_record.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
 
   return Shift(tables, price, work_time.first, work_time.second);
 }
+

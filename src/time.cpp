@@ -21,9 +21,40 @@ Time::Time(int hours, int minutes):
   }
 }
 
+bool Time::operator<(const Time & rhs) const
+{
+  if (getHours() < rhs.getHours())
+  {
+    return true;
+  }
+  else if (getHours() == rhs.getHours())
+  {
+    return getMinutes() < rhs.getMinutes();
+  }
+  else
+  {
+    return false;
+  }
+}
+
+bool Time::operator>=(const Time & rhs) const
+{
+  return !(*this < rhs);
+}
+
+int Time::getHours() const noexcept
+{
+  return this->h;
+}
+
+int Time::getMinutes() const noexcept
+{
+  return this->m;
+}
+
 std::ostream & operator<<(std::ostream & out, const Time & time)
 {
-  std::string hours = std::to_string(time.h);
+  std::string hours = std::to_string(time.getHours());
   if (hours.length() == 1)
   {
     out << '0' << hours;
@@ -35,7 +66,7 @@ std::ostream & operator<<(std::ostream & out, const Time & time)
 
   out << ':';
 
-  std::string minutes = std::to_string(time.m);
+  std::string minutes = std::to_string(time.getMinutes());
   if (minutes.length() == 1)
   {
     out << '0' << minutes;
@@ -46,4 +77,31 @@ std::ostream & operator<<(std::ostream & out, const Time & time)
   }
 
   return out;
+}
+
+Time parseTimeStringToObject(const std::string & time)
+{
+  std::string str_hours = time.substr(0, 2);
+  int hours = 0;
+  if (str_hours[0] == '0')
+  {
+    hours = str_hours[1] - '0';
+  }
+  else
+  {
+    hours = std::stoi(str_hours);
+  }
+
+  std::string str_minutes = time.substr(3, 2);
+  int minutes = 0;
+  if (str_minutes[0] == '0')
+  {
+    minutes = str_minutes[1] - '0';
+  }
+  else
+  {
+    minutes = std::stoi(str_hours);
+  }
+
+  return Time(hours, minutes);
 }

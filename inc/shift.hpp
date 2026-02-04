@@ -1,20 +1,31 @@
 #ifndef SHIFT_HPP
 #define SHIFT_HPP
 
-#include "time.hpp"
-
+#include <iostream>
 #include <fstream>
 #include <cstddef>
-#include <queue>
+#include <map>
+
+#include "time.hpp"
+
+struct Client
+{
+  bool is_inside;
+  bool is_waiting;
+  size_t table_num;
+  std::string name;
+};
 
 struct Shift
 {
   Shift(size_t tables_num, size_t price_per_hour, const Time & time_start, const Time & time_end);
   ~Shift();
+  void recordClient(const Time & time, const Client & client);
+  void toSeatClient(Client & client);
 private:
   struct Table
   {
-    std::ostream & outputBusyTime(std::ostream & out);
+    std::ostream & outputBusyTime(std::ostream & out) const;
   private:
     size_t profit = 0;
     Time busy_time;
@@ -24,9 +35,9 @@ private:
   Time start;
   Time end;
   Table * tables;
+  std::map< std::string, Client > clients;
 };
 
 Shift initShiftByFileData(std::ifstream & shift_record);
-std::ostream & simulateShiftAndOutputInfo(std::ostream & out, std::ifstream & shift_record, Shift & shift);
 
 #endif
