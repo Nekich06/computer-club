@@ -2,6 +2,11 @@
 
 #include <string>
 
+Time::Time():
+  h(0),
+  m(0)
+{}
+
 Time::Time(int hours, int minutes):
   h(hours),
   m(minutes)

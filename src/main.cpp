@@ -4,6 +4,7 @@
 #include <cstring>
 
 #include "shift.hpp"
+#include "event_handlers.hpp"
 
 namespace
 {
@@ -28,10 +29,16 @@ int main(const int argc, const char * const * argv)
   {
     std::ifstream shift_record(createFileStream(argc, argv));
     Shift shift = initShiftByFileData(shift_record);
+    simulateShiftAndOutputInfo(std::cout, shift_record, shift);
   }
   catch (const std::logic_error & e)
   {
     std::cout << e.what() << '\n';
     return 1;
+  }
+  catch (const std::bad_alloc & e)
+  {
+    std::cerr << e.what() << '\n';
+    return 2;
   }
 }

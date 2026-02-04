@@ -5,6 +5,7 @@
 
 struct Time
 {
+  Time();
   Time(int hours, int minutes);
   int h;
   int m;
