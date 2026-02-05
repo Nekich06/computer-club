@@ -19,5 +19,6 @@ private:
 
 std::ostream & operator<<(std::ostream & out, const Time & time);
 Time parseTimeStringToObject(const std::string & time);
+std::string turnTimeToString(const Time & time);
 
 #endif

@@ -98,8 +98,25 @@ Time parseTimeStringToObject(const std::string & time)
   }
   else
   {
-    minutes = std::stoi(str_hours);
+    minutes = std::stoi(str_minutes);
   }
 
   return Time(hours, minutes);
+}
+
+std::string turnTimeToString(const Time & time)
+{
+  std::string hours = std::to_string(time.getHours());
+  if (hours.length() == 1)
+  {
+    hours = '0' + hours;
+  }
+
+  std::string minutes = std::to_string(time.getMinutes());
+  if (minutes.length() == 1)
+  {
+    minutes = '0' + minutes;
+  }
+
+  return hours + ':' + minutes;
 }

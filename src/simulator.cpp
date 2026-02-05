@@ -68,10 +68,6 @@ namespace
   {
 
   }
-  void error(Shift & shift)
-  {
-
-  }
 
   std::string getEventID(const std::string & event_info)
   {
@@ -89,14 +85,13 @@ void initEventHandlers(EventHandlers & event_handlers, std::string & event_info,
   event_handlers.insert({ CLIENT_WENT_AWAY, std::bind(clientWentAway, std::cref(event_info), std::ref(shift)) });
   event_handlers.insert({ CLIENT_WENT_AWAY_BY_CAUSE, std::bind(clientWentAwayByCause, std::cref(event_info), std::ref(shift)) });
   event_handlers.insert({ CLIENT_TOOK_THE_TABLE_AFTER_WAITING, std::bind(clientTookTheTableAfterWaiting, std::cref(event_info), std::ref(shift)) });
-  event_handlers.insert({ ERROR, std::bind(error, std::ref(shift)) });
 }
 
 void simulateShiftAndOutputInfo(std::ostream & out, std::ifstream & shift_record, Shift & shift, const EventHandlers & event_handlers, std::string & event_info)
 {
-  while (!shift_record.eof())
+  out << shift.getShiftStartTime() << '\n';
+  while (std::getline(shift_record, event_info, '\n'))
   {
-    std::getline(shift_record, event_info, '\n');
     std::string ID = getEventID(event_info);
     try
     {
@@ -110,7 +105,12 @@ void simulateShiftAndOutputInfo(std::ostream & out, std::ifstream & shift_record
     {
       throw FormatError(event_info.c_str());
     }
+    catch (const ClientError & e)
+    {
+      out << e.what() << '\n';
+    }
   }
+  out << shift.getShiftEndTime() << '\n';
 }
 
 Shift initShiftByFileData(std::ifstream & shift_record)

@@ -6,6 +6,8 @@
 
 namespace
 {
+  std::string errors_id = "13";
+
   enum Errors
   {
     YOU_SHALL_NOT_PASS,
@@ -15,7 +17,7 @@ namespace
     I_CAN_WAIT_NO_LONGER
   };
 
-  const char * errors[] =
+  std::string errors[] =
   {
     "YouShallNotPass",
     "NotOpenYet",
@@ -23,6 +25,11 @@ namespace
     "ClientUknown",
     "ICanWaitNoLonger!"
   };
+
+  std::string formatError(const Time & time, std::string & error)
+  {
+    return turnTimeToString(time) + ' ' + errors_id + ' ' + error;
+  }
 }
 
 Shift::Shift(size_t tables_num, size_t price_per_hour, const Time & time_start, const Time & time_end):
@@ -40,18 +47,28 @@ Shift::~Shift()
   delete[] tables;
 }
 
+Time Shift::getShiftStartTime() const
+{
+  return start;
+}
+
+Time Shift::getShiftEndTime() const
+{
+  return end;
+}
+
 void Shift::recordClient(const Time & time, const Client & client)
 {
-  if (time < start)
+  if (time >= start && time < end)
   {
     if (!clients.insert({ client.name, client }).second)
     {
-      throw ClientError(errors[YOU_SHALL_NOT_PASS]);
+      throw ClientError(formatError(time, errors[YOU_SHALL_NOT_PASS]));
     }
   }
   else
   {
-    throw ClientError(errors[NOT_OPEN_YET]);
+    throw ClientError(formatError(time, errors[NOT_OPEN_YET]));
   }
 }
 

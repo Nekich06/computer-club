@@ -20,6 +20,8 @@ struct Shift
 {
   Shift(size_t tables_num, size_t price_per_hour, const Time & time_start, const Time & time_end);
   ~Shift();
+  Time getShiftStartTime() const;
+  Time getShiftEndTime() const;
   void recordClient(const Time & time, const Client & client);
   void toSeatClient(Client & client);
 private:
