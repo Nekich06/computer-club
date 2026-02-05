@@ -1,4 +1,4 @@
-#include "simulation_errors.hpp"
+#include "errors.hpp"
 
 ClientError::ClientError(const char * msg):
   message(msg)

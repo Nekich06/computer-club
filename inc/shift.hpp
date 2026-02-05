@@ -2,8 +2,8 @@
 #define SHIFT_HPP
 
 #include <iostream>
-#include <fstream>
 #include <cstddef>
+#include <string>
 #include <map>
 
 #include "time.hpp"
@@ -37,7 +37,5 @@ private:
   Table * tables;
   std::map< std::string, Client > clients;
 };
-
-Shift initShiftByFileData(std::ifstream & shift_record);
 
 #endif

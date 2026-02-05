@@ -4,8 +4,8 @@
 #include <cstring>
 
 #include "shift.hpp"
-#include "event_handlers.hpp"
-#include "simulation_errors.hpp"
+#include "simulator.hpp"
+#include "errors.hpp"
 
 namespace
 {

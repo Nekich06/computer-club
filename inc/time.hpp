@@ -2,6 +2,7 @@
 #define TIME_HPP
 
 #include <iostream>
+#include <string>
 
 struct Time
 {

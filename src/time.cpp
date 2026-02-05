@@ -1,7 +1,5 @@
 #include "time.hpp"
 
-#include <string>
-
 Time::Time():
   h(0),
   m(0)

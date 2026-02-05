@@ -1,5 +1,5 @@
-#ifndef EXCEPTIONS_HPP
-#define EXCEPTIONS_HPP
+#ifndef ERRORS_HPP
+#define ERRORS_HPP
 
 #include <stdexcept>
 

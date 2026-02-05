@@ -1,7 +1,9 @@
-#ifndef EVENT_HANDLERS_HPP
-#define EVENT_HANDLERS_HPP
+#ifndef SIMULATOR_HPP
+#define SIMULATOR_HPP
 
 #include <functional>
+#include <iostream>
+#include <fstream>
 #include <string>
 #include <map>
 
@@ -20,6 +22,7 @@ enum Event
 
 using EventHandlers = std::map< Event, std::function< void() > >;
 
+Shift initShiftByFileData(std::ifstream & shift_record);
 void initEventHandlers(EventHandlers & event_handlers, std::string & event_info, Shift & shift);
 void simulateShiftAndOutputInfo(std::ostream & out, std::ifstream & shift_record, Shift & shift, const EventHandlers & event_handlers, std::string & event_info);
 
