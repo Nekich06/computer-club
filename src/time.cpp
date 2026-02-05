@@ -21,7 +21,7 @@ Time::Time(int hours, int minutes):
   }
 }
 
-bool Time::operator<(const Time & rhs) const
+bool Time::operator<(const Time & rhs) const noexcept
 {
   if (getHours() < rhs.getHours())
   {
@@ -37,7 +37,7 @@ bool Time::operator<(const Time & rhs) const
   }
 }
 
-bool Time::operator>=(const Time & rhs) const
+bool Time::operator>=(const Time & rhs) const noexcept
 {
   return !(*this < rhs);
 }

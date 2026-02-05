@@ -1,19 +1,23 @@
 #include "event_handlers.hpp"
 
+#include "simulation_errors.hpp"
+
 namespace
 {
+
+
   std::string getWord(const std::string & event_info, size_t & start_pos)
   {
     size_t temp = start_pos;
     start_pos = event_info.find(' ', start_pos);
-    return event_info.substr(temp, start_pos - temp);
+    return event_info.substr(temp, start_pos++ - temp);
   }
 
   void clientCame(const std::string & event_info, Shift & shift)
   {
     size_t pos = 0;
     std::string time_str = getWord(event_info, pos);
-    pos += 3;
+    pos += 2;
     std::string name = getWord(event_info, pos);
     Time time = parseTimeStringToObject(time_str);
     shift.recordClient(time, Client{ true, false, 0, name });
@@ -68,14 +72,20 @@ void simulateShiftAndOutputInfo(std::ostream & out, std::ifstream & shift_record
   while (!shift_record.eof())
   {
     std::getline(shift_record, event_info, '\n');
+    std::cout << event_info << '\n';
     std::string ID = getEventID(event_info);
+    std::cout << ID << '\n';
     try
     {
       event_handlers.at(static_cast< Event >(std::stoi(ID)))();
     }
     catch (const std::out_of_range & e)
     {
-      throw std::invalid_argument(event_info);
+      throw FormatError(event_info.c_str());
+    }
+    catch (const FormatError & e)
+    {
+      throw FormatError(event_info.c_str());
     }
   }
 }

@@ -5,6 +5,7 @@
 
 #include "shift.hpp"
 #include "event_handlers.hpp"
+#include "simulation_errors.hpp"
 
 namespace
 {
@@ -36,14 +37,6 @@ int main(const int argc, const char * const * argv)
 
     simulateShiftAndOutputInfo(std::cout, shift_record, shift, event_handlers, event_info);
   }
-  catch (const std::out_of_range & e)
-  {
-    std::cout << e.what() << '\n';
-  }
-  catch (const std::invalid_argument & e)
-  {
-    std::cout << e.what() << '\n';
-  }
   catch (const std::logic_error & e)
   {
     std::cout << e.what() << '\n';
@@ -53,5 +46,10 @@ int main(const int argc, const char * const * argv)
   {
     std::cerr << e.what() << '\n';
     return 2;
+  }
+  catch (const FormatError & e)
+  {
+    std::cout << e.what() << '\n';
+    return 3;
   }
 }

@@ -1,10 +1,14 @@
 #include "shift.hpp"
 
 #include <limits>
+#include <string>
+
+#include "simulation_errors.hpp"
 
 namespace
 {
-  enum Errors {
+  enum Errors
+  {
     YOU_SHALL_NOT_PASS,
     NOT_OPEN_YET,
     PLACE_IS_BUSY,
@@ -12,7 +16,8 @@ namespace
     I_CAN_WAIT_NO_LONGER
   };
 
-  std::string err_msgs[] = {
+  const char * errors[] =
+  {
     "YouShallNotPass",
     "NotOpenYet",
     "PlaceIsBusy",
@@ -20,15 +25,31 @@ namespace
     "ICanWaitNoLonger!"
   };
 
+  std::string getWord(const std::string & event_info, size_t & start_pos)
+  {
+    size_t temp = start_pos;
+    start_pos = event_info.find(' ', start_pos);
+    return event_info.substr(temp, start_pos++ - temp);
+  }
+
   std::pair< Time, Time > initShiftTime(std::ifstream & shift_record)
   {
-    std::string time_start;
-    shift_record >> time_start;
-    Time start = parseTimeStringToObject(time_start);
-
-    std::string time_end;
-    shift_record >> time_end;
-    Time end = parseTimeStringToObject(time_end);
+    std::string timeline;
+    Time start;
+    Time end;
+    std::getline(shift_record, timeline, '\n');
+    try
+    {
+      size_t pos = 0;
+      std::string time_start = getWord(timeline, pos);
+      start = parseTimeStringToObject(time_start);
+      std::string time_end = getWord(timeline, pos);
+      end = parseTimeStringToObject(time_end);
+    }
+    catch (const std::invalid_argument & e)
+    {
+      throw FormatError(timeline.c_str());
+    }
     return std::make_pair(start, end);
   }
 }
@@ -54,12 +75,12 @@ void Shift::recordClient(const Time & time, const Client & client)
   {
     if (!clients.insert({ client.name, client }).second)
     {
-      throw std::invalid_argument(err_msgs[YOU_SHALL_NOT_PASS]);
+      throw ClientError(errors[YOU_SHALL_NOT_PASS]);
     }
   }
   else
   {
-    throw std::invalid_argument(err_msgs[NOT_OPEN_YET]);
+    throw ClientError(errors[NOT_OPEN_YET]);
   }
 }
 
@@ -70,24 +91,23 @@ std::ostream & Shift::Table::outputBusyTime(std::ostream & out) const
 
 Shift initShiftByFileData(std::ifstream & shift_record)
 {
-  long long int tables = 0;
-  shift_record >> tables;
+  std::string tables_str;
+  std::getline(shift_record, tables_str, '\n');
+  long long int tables = std::stoll(tables_str);
   if (tables <= 0)
   {
-    throw std::invalid_argument(std::to_string(tables));
+    throw FormatError(tables_str.c_str());
   }
 
   std::pair< Time, Time > work_time = initShiftTime(shift_record);
 
-  long long int price = 0;
-  shift_record >> price;
+  std::string price_str;
+  std::getline(shift_record, price_str, '\n');
+  long long int price = std::stoll(price_str);
   if (price <= 0)
   {
-    throw std::invalid_argument(std::to_string(price));
+    throw FormatError(price_str.c_str());
   }
-
-  shift_record.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
-
   return Shift(tables, price, work_time.first, work_time.second);
 }
 
