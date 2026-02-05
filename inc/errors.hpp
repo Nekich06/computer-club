@@ -6,19 +6,19 @@
 class ClientError : public std::exception
 {
 public:
-  explicit ClientError(const char * msg);
+  explicit ClientError(const std::string & msg);
   const char * what() const noexcept override;
 private:
-  const char * message;
+  const std::string message;
 };
 
 class FormatError : public std::exception
 {
 public:
-  explicit FormatError(const char * msg);
+  explicit FormatError(const std::string & msg);
   const char * what() const noexcept override;
 private:
-  const char * message;
+  const std::string message;
 };
 
 #endif

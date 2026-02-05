@@ -29,6 +29,12 @@ namespace
     {
       throw FormatError(timeline.c_str());
     }
+
+    if (end < start)
+    {
+      throw FormatError(timeline.c_str());
+    }
+
     return std::make_pair(start, end);
   }
 
@@ -91,9 +97,7 @@ void simulateShiftAndOutputInfo(std::ostream & out, std::ifstream & shift_record
   while (!shift_record.eof())
   {
     std::getline(shift_record, event_info, '\n');
-    std::cout << event_info << '\n';
     std::string ID = getEventID(event_info);
-    std::cout << ID << '\n';
     try
     {
       event_handlers.at(static_cast< Event >(std::stoi(ID)))();

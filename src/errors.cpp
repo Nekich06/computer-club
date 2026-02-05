@@ -1,20 +1,20 @@
 #include "errors.hpp"
 
-ClientError::ClientError(const char * msg):
+ClientError::ClientError(const std::string & msg):
   message(msg)
 {}
 
 const char * ClientError::what() const noexcept
 {
-  return message;
+  return message.c_str();
 }
 
-FormatError::FormatError(const char * msg):
+FormatError::FormatError(const std::string & msg):
   message(msg)
 {}
 
 const char * FormatError::what() const noexcept
 {
-  return message;
+  return message.c_str();
 }
 
