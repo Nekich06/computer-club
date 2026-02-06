@@ -3,27 +3,14 @@
 
 #include <functional>
 #include <iostream>
-#include <fstream>
-#include <string>
 #include <map>
 
 #include "shift.hpp"
+#include "event.hpp"
 
-enum Event
-{
-  CLIENT_CAME = 1,
-  CLIENT_TOOK_THE_TABLE,
-  CLIENT_WAITING,
-  CLIENT_WENT_AWAY,
-  CLIENT_WENT_AWAY_BY_CAUSE = 11,
-  CLIENT_TOOK_THE_TABLE_AFTER_WAITING,
-  ERROR
-};
+using EventHandlers = std::map< EventID, std::function< void() > >;
 
-using EventHandlers = std::map< Event, std::function< void() > >;
-
-Shift initShiftByFileData(std::ifstream & shift_record);
-void initEventHandlers(EventHandlers & event_handlers, std::string & event_info, Shift & shift);
-void simulateShiftAndOutputInfo(std::ostream & out, std::ifstream & shift_record, Shift & shift, const EventHandlers & event_handlers, std::string & event_info);
+void initEventHandlers(EventHandlers & event_handlers, Shift & shift, const Event & event);
+void simulateShiftAndOutputInfo(std::ostream & out, Shift & shift, const EventHandlers & event_handlers, const Events & events, Event & event);
 
 #endif

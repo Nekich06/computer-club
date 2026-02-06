@@ -22,6 +22,7 @@ struct Shift
   ~Shift();
   Time getShiftStartTime() const;
   Time getShiftEndTime() const;
+  size_t getShiftTablesNumber() const noexcept;
   void recordClient(const Time & time, const Client & client);
   void toSeatClient(Client & client);
 private:

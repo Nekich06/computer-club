@@ -2,13 +2,12 @@
 
 #include <limits>
 
+#include "event.hpp"
 #include "errors.hpp"
 
 namespace
 {
-  std::string errors_id = "13";
-
-  enum Errors
+  enum ErrorID
   {
     YOU_SHALL_NOT_PASS,
     NOT_OPEN_YET,
@@ -28,7 +27,7 @@ namespace
 
   std::string formatError(const Time & time, std::string & error)
   {
-    return turnTimeToString(time) + ' ' + errors_id + ' ' + error;
+    return turnTimeToString(time) + ' ' + std::to_string(ERROR) + ' ' + error;
   }
 }
 
@@ -55,6 +54,11 @@ Time Shift::getShiftStartTime() const
 Time Shift::getShiftEndTime() const
 {
   return end;
+}
+
+size_t Shift::getShiftTablesNumber() const noexcept
+{
+  return tables_n;
 }
 
 void Shift::recordClient(const Time & time, const Client & client)

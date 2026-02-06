@@ -4,8 +4,9 @@
 #include <cstring>
 
 #include "shift.hpp"
-#include "simulator.hpp"
+#include "parser.hpp"
 #include "errors.hpp"
+#include "simulator.hpp"
 
 namespace
 {
@@ -29,13 +30,15 @@ int main(const int argc, const char * const * argv)
   try
   {
     std::ifstream shift_record(createFileStream(argc, argv));
-    Shift shift = initShiftByFileData(shift_record);
 
+    Events events;
+    Shift shift = parseInputFileIntoShiftAndEvents(shift_record, events);
+
+    Event event_info;
     EventHandlers event_handlers;
-    std::string event_info;
-    initEventHandlers(event_handlers, event_info, shift);
+    initEventHandlers(event_handlers, shift, event_info);
 
-    simulateShiftAndOutputInfo(std::cout, shift_record, shift, event_handlers, event_info);
+    simulateShiftAndOutputInfo(std::cout, shift, event_handlers, events, event_info);
   }
   catch (const std::logic_error & e)
   {
