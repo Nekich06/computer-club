@@ -1,5 +1,7 @@
 #include "time.hpp"
 
+#include <cmath>
+
 Time::Time():
   h(0),
   m(0)
@@ -38,6 +40,28 @@ bool Time::operator<(const Time & rhs) const noexcept
 bool Time::operator>=(const Time & rhs) const noexcept
 {
   return !(*this < rhs);
+}
+
+Time Time::operator-(const Time & rhs) const
+{
+  if (*this < rhs)
+  {
+    throw std::invalid_argument("Time is not consistent");
+  }
+  int hours = 0;
+  int minutes = m + rhs.m;
+  if (minutes > 59)
+  {
+    minutes = minutes - 60;
+    ++hours;
+    hours += h - rhs.h;
+  }
+  else
+  {
+    minutes = m - rhs.m;
+    hours = h - rhs.h;
+  }
+  return Time(hours, minutes);
 }
 
 int Time::getHours() const noexcept

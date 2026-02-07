@@ -6,27 +6,29 @@ namespace
 {
   void clientCame(const Event & event_info, Shift & shift)
   {
-    std::string name = event_info.client_name;
-    Time time = event_info.time;
-    shift.recordClient(time, Client{ true, false, 0, name });
+    shift.recordClient(event_info.time, Client{ 0, event_info.client_name });
   }
 
   void clientTookTheTable(const Event & event_info, Shift & shift)
   {
-
+    shift.toSeatClient(event_info.time, event_info.client_name, event_info.table_num);
   }
+
   void clientWaiting(const Event & event_info, Shift & shift)
   {
-
+    shift.recordWaiting(event_info.time, event_info.client_name);
   }
+
   void clientWentAway(const Event & event_info, Shift & shift)
   {
 
   }
+
   void clientWentAwayByCause(const Event & event_info, Shift & shift)
   {
-
+    shift.unrecordClient(event_info.time, event_info.client_name);
   }
+
   void clientTookTheTableAfterWaiting(const Event & event_info, Shift & shift)
   {
 
@@ -57,6 +59,12 @@ void simulateShiftAndOutputInfo(std::ostream & out, Shift & shift, const EventHa
     catch (const ClientError & e)
     {
       out << e.what() << '\n';
+    }
+    catch (const OutgoingEvent & e)
+    {
+      out << e.what() << '\n';
+      event = e.getEventInfo();
+      event_handlers.at(event.id);
     }
   }
   out << shift.getShiftEndTime() << '\n';

@@ -69,6 +69,7 @@ namespace
   void fillEventsInfo(std::ifstream & shift_record, Events & events, size_t tables)
   {
     std::string event_info;
+    Time recent_event_time;
     while (std::getline(shift_record, event_info, '\n'))
     {
       try
@@ -76,6 +77,10 @@ namespace
         size_t pos = 0;
         std::string time_str = getWord(event_info, pos);
         Time time = parseTimeStringToObject(time_str);
+        if (time < recent_event_time)
+        {
+          throw std::invalid_argument("Events are not consistent in time");
+        }
         int id = std::stoi(getWord(event_info, pos));
         if (id < CLIENT_CAME || id > CLIENT_WENT_AWAY)
         {
@@ -98,6 +103,7 @@ namespace
         {
           events.push_back(Event{ time, event_id, client_name, 0 });
         }
+        recent_event_time = time;
       }
       catch (const std::invalid_argument & e)
       {
