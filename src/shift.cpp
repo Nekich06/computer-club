@@ -115,6 +115,10 @@ void Shift::toSeatClient(const Time & time, const std::string & client_name, siz
   try
   {
     Client & client = clients.at(client_name);
+    if (client.table_num)
+    {
+      tables[client.table_num - 1].getBillsAndLetGoClient(time, price);
+    }
     if (tables[table_number - 1].isBusy())
     {
       throw ClientError(formatError(time, errors[PLACE_IS_BUSY]));
@@ -175,7 +179,7 @@ void Shift::unrecordClient(const Time & time, const std::string & client_name)
     {
       tables[table_number - 1].getBillsAndLetGoClient(time, price);
       clients.erase(client_name);
-      if (!waiting_queue.empty())
+      if (!waiting_queue.empty() && time != end)
       {
         std::string waiting_client_name = waiting_queue.back().name;
         waiting_queue.pop();

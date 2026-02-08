@@ -42,6 +42,16 @@ bool Time::operator>=(const Time & rhs) const noexcept
   return !(*this < rhs);
 }
 
+bool Time::operator==(const Time & rhs) const noexcept
+{
+  return h == rhs.h && m == rhs.m;
+}
+
+bool Time::operator!=(const Time & rhs) const noexcept
+{
+  return !(*this == rhs);
+}
+
 Time Time::operator+(const Time & rhs) const
 {
   int this_minutes = h * 60 + m;

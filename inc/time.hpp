@@ -10,6 +10,8 @@ struct Time
   Time(int hours, int minutes);
   bool operator<(const Time & rhs) const noexcept;
   bool operator>=(const Time & rhs) const noexcept;
+  bool operator==(const Time & rhs) const noexcept;
+  bool operator!=(const Time & rhs) const noexcept;
   Time operator+(const Time & rhs) const;
   Time operator-(const Time & rhs) const;
   int getHours() const noexcept;
