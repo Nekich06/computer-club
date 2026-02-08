@@ -29,6 +29,18 @@ namespace
   {
     return turnTimeToString(time) + ' ' + std::to_string(ERROR) + ' ' + error;
   }
+
+  std::string formatEventInfo(const Time & time, const std::string & client_name, EventID id, long long table_num)
+  {
+    if (table_num)
+    {
+      return (turnTimeToString(time) + ' ' + std::to_string(id) + ' ' + client_name + ' ' + std::to_string(table_num));
+    }
+    else
+    {
+      return (turnTimeToString(time) + ' ' + std::to_string(id) + ' ' + client_name);
+    }
+  }
 }
 
 Shift::Shift(size_t tables_num, size_t price_per_hour, const Time & time_start, const Time & time_end):
@@ -68,6 +80,21 @@ size_t Shift::getShiftPrice() const noexcept
   return price;
 }
 
+size_t Shift::getShiftClientsNumber() const
+{
+  return clients.size();
+}
+
+std::list< std::string > Shift::getCurrentClientsNames() const
+{
+  std::list< std::string > clients_names;
+  for (auto it = clients.cbegin(); it != clients.cend(); ++it)
+  {
+    clients_names.push_back(it->first);
+  }
+  return std::move(clients_names);
+}
+
 void Shift::recordClient(const Time & time, const Client & client)
 {
   if (time >= start && time < end)
@@ -87,13 +114,13 @@ void Shift::toSeatClient(const Time & time, const std::string & client_name, siz
 {
   try
   {
-    Client client = clients.at(client_name);
-    if (tables[table_number].isBusy())
+    Client & client = clients.at(client_name);
+    if (tables[table_number - 1].isBusy())
     {
       throw ClientError(formatError(time, errors[PLACE_IS_BUSY]));
     }
     client.table_num = table_number;
-    tables[table_number].takeClient(time);
+    tables[table_number - 1].takeClient(time);
   }
   catch (const std::out_of_range & e)
   {
@@ -105,7 +132,7 @@ void Shift::recordWaiting(const Time & time, const std::string & client_name)
 {
   try
   {
-    Client client = clients.at(client_name);
+    Client & client = clients.at(client_name);
     bool is_worth = true;
     for (size_t i = 0; i < tables_n; ++i)
     {
@@ -124,7 +151,8 @@ void Shift::recordWaiting(const Time & time, const std::string & client_name)
     }
     else
     {
-      throw OutgoingEvent(time, client_name, CLIENT_WENT_AWAY_BY_CAUSE, 0LL);
+      std::string msg = formatEventInfo(time, client_name, CLIENT_WENT_AWAY_BY_CAUSE, 0LL);
+      throw OutgoingEvent(time, client_name, CLIENT_WENT_AWAY_BY_CAUSE, 0LL, msg);
     }
   }
   catch (const std::out_of_range & e)
@@ -137,15 +165,23 @@ void Shift::unrecordClient(const Time & time, const std::string & client_name)
 {
   try
   {
-    Client client = clients.at(client_name);
-    if (client.table_num)
+    Client & client = clients.at(client_name);
+    size_t table_number = client.table_num;
+    if (!table_number)
     {
       clients.erase(client_name);
     }
     else
     {
-      tables[client.table_num].getBillsAndLetGoClient(time, price);
+      tables[table_number - 1].getBillsAndLetGoClient(time, price);
       clients.erase(client_name);
+      if (!waiting_queue.empty())
+      {
+        std::string waiting_client_name = waiting_queue.back().name;
+        waiting_queue.pop();
+        std::string msg = formatEventInfo(time, waiting_client_name, CLIENT_TOOK_THE_TABLE_AFTER_WAITING, table_number);
+        throw OutgoingEvent(time, waiting_client_name, CLIENT_TOOK_THE_TABLE_AFTER_WAITING, table_number, msg);
+      }
     }
   }
   catch (const std::out_of_range & e)
@@ -154,9 +190,28 @@ void Shift::unrecordClient(const Time & time, const std::string & client_name)
   }
 }
 
-std::ostream & Shift::Table::outputBusyTime(std::ostream & out) const
+void Shift::endShift()
 {
-  return out << total_busy_time;
+  for (auto it = clients.cbegin(); it != clients.cend(); ++it)
+  {
+    unrecordClient(end, it->first);
+  }
+}
+
+std::ostream & Shift::outputTablesInfo(std::ostream & out) const
+{
+  for (size_t i = 0; i < tables_n; ++i)
+  {
+    out << i << ' ';
+    tables[i].outputInfo(out);
+    out << '\n';
+  }
+  return out;
+}
+
+std::ostream & Shift::Table::outputInfo(std::ostream & out) const
+{
+  return out << profit << ' ' << total_busy_time;
 }
 
 void Shift::Table::takeClient(const Time & time)
@@ -167,7 +222,9 @@ void Shift::Table::takeClient(const Time & time)
 
 void Shift::Table::getBillsAndLetGoClient(const Time & time, size_t price)
 {
-  profit = ((time - last_not_busy_time).getHours() + 1) * price;
+  Time client_busy_time = time - last_not_busy_time;
+  profit = (client_busy_time.getHours() + 1) * price;
+  total_busy_time = total_busy_time + client_busy_time;
   is_busy_now = false;
 }
 

@@ -18,23 +18,17 @@ const char * FormatError::what() const noexcept
   return message.c_str();
 }
 
-OutgoingEvent::OutgoingEvent(const Time & event_time, const std::string & client_name, EventID id, long long table):
+OutgoingEvent::OutgoingEvent(const Time & event_time, const std::string & client_name, EventID id, long long table, std::string & msg):
   time(event_time),
   name(client_name),
   event_id(id),
-  table_num(table)
+  table_num(table),
+  message(msg)
 {}
 
 const char * OutgoingEvent::what() const noexcept
 {
-  if (table_num)
-  {
-    return (turnTimeToString(time) + ' ' + std::to_string(event_id) + ' ' + name + std::to_string(table_num)).c_str();
-  }
-  else
-  {
-    return (turnTimeToString(time) + ' ' + std::to_string(event_id) + ' ' + name).c_str();
-  }
+  return message.c_str();
 }
 
 const Event OutgoingEvent::getEventInfo() const

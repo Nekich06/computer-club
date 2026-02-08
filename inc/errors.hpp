@@ -28,7 +28,7 @@ private:
 class OutgoingEvent : public std::exception
 {
 public:
-  explicit OutgoingEvent(const Time & event_time, const std::string & client_name, EventID id, long long table);
+  OutgoingEvent(const Time & event_time, const std::string & client_name, EventID id, long long table, std::string & msg);
   const char * what() const noexcept override;
   const Event getEventInfo() const;
 private:
@@ -36,6 +36,7 @@ private:
   const std::string name;
   const EventID event_id;
   const long long table_num;
+  const std::string message;
 };
 
 #endif

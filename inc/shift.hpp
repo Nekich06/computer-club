@@ -5,6 +5,7 @@
 #include <cstddef>
 #include <string>
 #include <queue>
+#include <list>
 #include <map>
 
 #include "time.hpp"
@@ -23,14 +24,18 @@ struct Shift
   Time getShiftEndTime() const;
   size_t getShiftTablesNumber() const noexcept;
   size_t getShiftPrice() const noexcept;
+  size_t getShiftClientsNumber() const;
+  std::list< std::string > getCurrentClientsNames() const;
   void recordClient(const Time & time, const Client & client);
   void toSeatClient(const Time & time, const std::string & client_name, size_t table_number);
   void recordWaiting(const Time & time, const std::string & client_name);
   void unrecordClient(const Time & time, const std::string & client_name);
+  void endShift();
+  std::ostream & outputTablesInfo(std::ostream & out) const;
 private:
   struct Table
   {
-    std::ostream & outputBusyTime(std::ostream & out) const;
+    std::ostream & outputInfo(std::ostream & out) const;
     void takeClient(const Time & time);
     void getBillsAndLetGoClient(const Time & time, size_t price);
     bool isBusy();

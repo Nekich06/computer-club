@@ -42,25 +42,27 @@ bool Time::operator>=(const Time & rhs) const noexcept
   return !(*this < rhs);
 }
 
+Time Time::operator+(const Time & rhs) const
+{
+  int this_minutes = h * 60 + m;
+  int rhs_minutes = rhs.h * 60 + rhs.m;
+  int result_minutes = this_minutes + rhs_minutes;
+  int hours = result_minutes / 60;
+  int minutes = result_minutes % 60;
+  return Time(hours, minutes);
+}
+
 Time Time::operator-(const Time & rhs) const
 {
   if (*this < rhs)
   {
     throw std::invalid_argument("Time is not consistent");
   }
-  int hours = 0;
-  int minutes = m + rhs.m;
-  if (minutes > 59)
-  {
-    minutes = minutes - 60;
-    ++hours;
-    hours += h - rhs.h;
-  }
-  else
-  {
-    minutes = m - rhs.m;
-    hours = h - rhs.h;
-  }
+  int this_minutes = h * 60 + m;
+  int rhs_minutes = rhs.h * 60 + rhs.m;
+  int result_minutes = this_minutes - rhs_minutes;
+  int hours = result_minutes / 60;
+  int minutes = result_minutes % 60;
   return Time(hours, minutes);
 }
 
