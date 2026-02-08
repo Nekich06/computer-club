@@ -2,7 +2,7 @@
 
 #include <string>
 
-#include "errors.hpp"
+#include "exceptions.hpp"
 
 namespace
 {
@@ -31,7 +31,7 @@ namespace
       std::string time_end = getWord(timeline, pos);
       end = parseTimeStringToObject(time_end);
     }
-    catch (const std::invalid_argument & e)
+    catch (const std::invalid_argument &)
     {
       throw FormatError(timeline);
     }

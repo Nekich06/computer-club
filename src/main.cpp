@@ -5,8 +5,8 @@
 
 #include "shift.hpp"
 #include "parser.hpp"
-#include "errors.hpp"
 #include "simulator.hpp"
+#include "exceptions.hpp"
 
 namespace
 {

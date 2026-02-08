@@ -1,7 +1,8 @@
 .PHONY: build run clean
 
+CXX ?= g++
 CFLAGS += -Iinc
-SRCS = src/main.cpp src/shift.cpp src/time.cpp src/simulator.cpp src/errors.cpp src/parser.cpp src/event.cpp
+SRCS = src/main.cpp src/shift.cpp src/time.cpp src/simulator.cpp src/exceptions.cpp src/parser.cpp src/event.cpp
 TARGET = bin/computer_club
 BIN_DIR = bin
 

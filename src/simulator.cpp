@@ -1,6 +1,6 @@
 #include "simulator.hpp"
 
-#include "errors.hpp"
+#include "exceptions.hpp"
 
 namespace
 {
@@ -68,8 +68,8 @@ void simulateShiftAndOutputInfo(std::ostream & out, Shift & shift, const EventHa
     }
     catch (const OutgoingEvent & e)
     {
-      out << e.what() << '\n';
       event = e.getEventInfo();
+      out << event << '\n';
       event_handlers.at(event.id)();
     }
   }

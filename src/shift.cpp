@@ -3,7 +3,7 @@
 #include <limits>
 
 #include "event.hpp"
-#include "errors.hpp"
+#include "exceptions.hpp"
 
 namespace
 {
@@ -28,18 +28,6 @@ namespace
   std::string formatError(const Time & time, std::string & error)
   {
     return turnTimeToString(time) + ' ' + std::to_string(ERROR) + ' ' + error;
-  }
-
-  std::string formatEventInfo(const Time & time, const std::string & client_name, EventID id, long long table_num)
-  {
-    if (table_num)
-    {
-      return (turnTimeToString(time) + ' ' + std::to_string(id) + ' ' + client_name + ' ' + std::to_string(table_num));
-    }
-    else
-    {
-      return (turnTimeToString(time) + ' ' + std::to_string(id) + ' ' + client_name);
-    }
   }
 }
 
@@ -155,8 +143,7 @@ void Shift::recordWaiting(const Time & time, const std::string & client_name)
     }
     else
     {
-      std::string msg = formatEventInfo(time, client_name, CLIENT_WENT_AWAY_BY_CAUSE, 0LL);
-      throw OutgoingEvent(time, client_name, CLIENT_WENT_AWAY_BY_CAUSE, 0LL, msg);
+      throw OutgoingEvent(Event{ time, CLIENT_WENT_AWAY_BY_CAUSE, client_name, 0LL });
     }
   }
   catch (const std::out_of_range & e)
@@ -170,7 +157,7 @@ void Shift::unrecordClient(const Time & time, const std::string & client_name)
   try
   {
     Client & client = clients.at(client_name);
-    size_t table_number = client.table_num;
+    long long table_number = client.table_num;
     if (!table_number)
     {
       clients.erase(client_name);
@@ -183,8 +170,7 @@ void Shift::unrecordClient(const Time & time, const std::string & client_name)
       {
         std::string waiting_client_name = waiting_queue.back().name;
         waiting_queue.pop();
-        std::string msg = formatEventInfo(time, waiting_client_name, CLIENT_TOOK_THE_TABLE_AFTER_WAITING, table_number);
-        throw OutgoingEvent(time, waiting_client_name, CLIENT_TOOK_THE_TABLE_AFTER_WAITING, table_number, msg);
+        throw OutgoingEvent(Event{ time, CLIENT_TOOK_THE_TABLE_AFTER_WAITING, waiting_client_name, table_number});
       }
     }
   }

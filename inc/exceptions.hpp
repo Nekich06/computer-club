@@ -1,5 +1,5 @@
-#ifndef ERRORS_HPP
-#define ERRORS_HPP
+#ifndef EXCEPTIONS_HPP
+#define EXCEPTIONS_HPP
 
 #include <stdexcept>
 #include <string>
@@ -28,15 +28,10 @@ private:
 class OutgoingEvent : public std::exception
 {
 public:
-  OutgoingEvent(const Time & event_time, const std::string & client_name, EventID id, long long table, std::string & msg);
-  const char * what() const noexcept override;
+  OutgoingEvent(const Event & event);
   const Event getEventInfo() const;
 private:
-  const Time time;
-  const std::string name;
-  const EventID event_id;
-  const long long table_num;
-  const std::string message;
+  const Event outgoing_event;
 };
 
 #endif
