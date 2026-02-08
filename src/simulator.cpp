@@ -35,7 +35,7 @@ namespace
     shift.endShift();
     for (auto it = clients_names.cbegin(); it != clients_names.cend(); ++it)
     {
-      out << shift.getShiftEndTime() << ' ' << *it << '\n';
+      out << shift.getShiftEndTime() << ' ' << CLIENT_WENT_AWAY_BY_CAUSE << ' ' << *it << '\n';
     }
     return out;
   }

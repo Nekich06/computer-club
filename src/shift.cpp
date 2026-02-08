@@ -192,9 +192,10 @@ void Shift::unrecordClient(const Time & time, const std::string & client_name)
 
 void Shift::endShift()
 {
-  for (auto it = clients.cbegin(); it != clients.cend(); ++it)
+  auto it = clients.cbegin();
+  while (it != clients.cend())
   {
-    unrecordClient(end, it->first);
+    unrecordClient(end, (it++)->first);
   }
 }
 
@@ -202,7 +203,7 @@ std::ostream & Shift::outputTablesInfo(std::ostream & out) const
 {
   for (size_t i = 0; i < tables_n; ++i)
   {
-    out << i << ' ';
+    out << i + 1 << ' ';
     tables[i].outputInfo(out);
     out << '\n';
   }
@@ -223,7 +224,7 @@ void Shift::Table::takeClient(const Time & time)
 void Shift::Table::getBillsAndLetGoClient(const Time & time, size_t price)
 {
   Time client_busy_time = time - last_not_busy_time;
-  profit = (client_busy_time.getHours() + 1) * price;
+  profit += (client_busy_time.getHours() + 1) * price;
   total_busy_time = total_busy_time + client_busy_time;
   is_busy_now = false;
 }
