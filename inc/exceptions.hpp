@@ -5,7 +5,6 @@
 #include <string>
 
 #include "event.hpp"
-#include "time.hpp"
 
 class ClientError : public std::exception
 {

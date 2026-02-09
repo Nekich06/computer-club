@@ -38,7 +38,7 @@ private:
     std::ostream & outputInfo(std::ostream & out) const;
     void takeClient(const Time & time);
     void getBillsAndLetGoClient(const Time & time, size_t price);
-    bool isBusy();
+    bool isBusy() const;
   private:
     bool is_busy_now = false;
     size_t profit = 0;
@@ -52,6 +52,7 @@ private:
   Table * tables;
   std::map< std::string, Client > clients;
   std::queue< Client > waiting_queue;
+  void unrecordClientUnsafe(const Time & time, const std::string & client_name);
 };
 
 #endif

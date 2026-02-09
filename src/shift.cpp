@@ -1,5 +1,6 @@
 #include "shift.hpp"
 
+#include <algorithm>
 #include <limits>
 
 #include "event.hpp"
@@ -80,7 +81,7 @@ std::list< std::string > Shift::getCurrentClientsNames() const
   {
     clients_names.push_back(it->first);
   }
-  return std::move(clients_names);
+  return clients_names;
 }
 
 void Shift::recordClient(const Time & time, const Client & client)
@@ -125,14 +126,12 @@ void Shift::recordWaiting(const Time & time, const std::string & client_name)
   try
   {
     Client & client = clients.at(client_name);
-    bool is_worth = true;
-    for (size_t i = 0; i < tables_n; ++i)
-    {
-      if (!tables[i].isBusy())
-      {
-        is_worth = false;
+    bool is_worth = std::all_of(
+      tables, tables + tables_n,
+      [](const auto& table) {
+        return table.isBusy();
       }
-    }
+    );
     if (!is_worth)
     {
       throw ClientError(formatError(time, errors[I_CAN_WAIT_NO_LONGER]));
@@ -166,7 +165,7 @@ void Shift::unrecordClient(const Time & time, const std::string & client_name)
     {
       tables[table_number - 1].getBillsAndLetGoClient(time, price);
       clients.erase(client_name);
-      if (!waiting_queue.empty() && time != end)
+      if (!waiting_queue.empty())
       {
         std::string waiting_client_name = waiting_queue.back().name;
         waiting_queue.pop();
@@ -182,10 +181,15 @@ void Shift::unrecordClient(const Time & time, const std::string & client_name)
 
 void Shift::endShift()
 {
+  while (!waiting_queue.empty())
+  {
+    waiting_queue.pop();
+  }
+
   auto it = clients.cbegin();
   while (it != clients.cend())
   {
-    unrecordClient(end, (it++)->first);
+    unrecordClientUnsafe(end, (it++)->first);
   }
 }
 
@@ -219,7 +223,21 @@ void Shift::Table::getBillsAndLetGoClient(const Time & time, size_t price)
   is_busy_now = false;
 }
 
-bool Shift::Table::isBusy()
+bool Shift::Table::isBusy() const
 {
   return is_busy_now;
+}
+
+void Shift::unrecordClientUnsafe(const Time & time, const std::string & client_name)
+{
+  Client & client = clients[client_name];
+  if (!client.table_num)
+  {
+    clients.erase(client_name);
+  }
+  else
+  {
+    tables[client.table_num - 1].getBillsAndLetGoClient(time, price);
+    clients.erase(client_name);
+  }
 }
