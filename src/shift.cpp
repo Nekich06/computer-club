@@ -115,7 +115,7 @@ void Shift::toSeatClient(const Time & time, const std::string & client_name, siz
     client.table_num = table_number;
     tables[table_number - 1].takeClient(time);
   }
-  catch (const std::out_of_range & e)
+  catch (const std::out_of_range &)
   {
     throw ClientError(formatError(time, errors[CLIENT_UNKNOWN]));
   }
@@ -145,7 +145,7 @@ void Shift::recordWaiting(const Time & time, const std::string & client_name)
       throw OutgoingEvent(Event{ time, CLIENT_WENT_AWAY_BY_CAUSE, client_name, 0LL });
     }
   }
-  catch (const std::out_of_range & e)
+  catch (const std::out_of_range &)
   {
     throw ClientError(formatError(time, errors[CLIENT_UNKNOWN]));
   }
@@ -173,7 +173,7 @@ void Shift::unrecordClient(const Time & time, const std::string & client_name)
       }
     }
   }
-  catch (const std::out_of_range & e)
+  catch (const std::out_of_range &)
   {
     throw ClientError(formatError(time, errors[CLIENT_UNKNOWN]));
   }

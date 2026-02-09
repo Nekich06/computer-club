@@ -110,7 +110,7 @@ namespace
         }
         recent_event_time = time;
       }
-      catch (const std::invalid_argument & e)
+      catch (const std::invalid_argument &)
       {
         throw FormatError(event_info);
       }
