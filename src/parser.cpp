@@ -66,7 +66,7 @@ namespace
     return Shift(tables, price, work_time.first, work_time.second);
   }
 
-  void fillEventsInfo(std::ifstream & shift_record, Events & events, size_t tables)
+  void fillEventsInfo(std::ifstream & shift_record, Events & events, size_t tables, Time shift_end)
   {
     std::string event_info;
     Time recent_event_time;
@@ -81,6 +81,11 @@ namespace
         {
           throw std::invalid_argument("Events are not consistent in time");
         }
+        else if (time >= shift_end)
+        {
+          throw std::invalid_argument("Event can not be handled after closing the shift");
+        }
+
         int id = std::stoi(getWord(event_info, pos));
         if (id < CLIENT_CAME || id > CLIENT_WENT_AWAY)
         {
@@ -116,6 +121,6 @@ namespace
 Shift parseInputFileIntoShiftAndEvents(std::ifstream & shift_record, Events & events)
 {
   Shift shift = getInitializedShift(shift_record);
-  fillEventsInfo(shift_record, events, shift.getShiftTablesNumber());
+  fillEventsInfo(shift_record, events, shift.getShiftTablesNumber(), shift.getShiftEndTime());
   return shift;
 }
